@@ -1,0 +1,13 @@
+$ gcc -std=c99 -o teste main.c
+#aqui é o seguinte: c99 é a versão do c que eu escolhi para o compilador reconhecer,
+#o nome que vem como parametro do -o é o nome do arquivo de saída que ficara salvo no diretorio
+#e em seguida tem o campo também como parametro do arquivo .c que você deseja executar
+#para executar o programa compilado, basta apertar ./ e em seguida o nome do arquivo de saída
+#assim:
+$ ./teste
+#para abrir um documento novo no gedit basta digitar gedit e o nome do arquivo com a extensão que #desejar, exemplo:
+gedit main.c ou gedit comandos.txt
+#para debugar, na hora de compilar, adciona o parametro -g3, abre outro terminal e digita:
+$gdb ./"nome do arquivo de saida"
+#para gerar o assemnly
+$ gcc -S -fno-asynchronous-unwind-tables assembly1.c
