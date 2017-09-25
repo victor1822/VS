@@ -5,6 +5,7 @@
 #define IMAGE_HEIGHT 512 // número de linhas da imagem.
 
 unsigned char * FBptr;
-
+int W=512;
+int H=512;
 #endif // _DEFINITIONS_H_
 

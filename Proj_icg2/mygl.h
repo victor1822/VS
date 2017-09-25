@@ -407,6 +407,161 @@ int get_x(){return x;}
 int get_y(){return y;}
 };
 
+
+    //Vetor operator -(Vetor v){return Vetor(x-v.get_x(),y-v.get_y(),z-v.get_z());}
+
+typedef struct pontoxyz{
+double x,y,z;
+}vectorR3;
+
+typedef struct Ray{
+vectorR3 origem,direcao;
+};
+
+vectorR3 cross(vectorR3 a,vectorR3 b){
+vectorR3 result;
+result.x = a.y*b.z-a.z*b.y;
+result.y = a.z*b.x-a.x*b.z;
+result.z = a.x*b.y-a.y*b.x;
+return result;
+
+}
+
+struct Light{
+vectorR3  pos;
+};
+
+double dot(vectorR3 a,vectorR3 b){
+return a.x*b.x+a.y*b.y+a.z*b.z;
+}
+
+double norma(vectorR3 a){
+a.x=a.x*a.x;
+a.y=a.y*a.y;
+a.z=a.z*a.z;
+return sqrt(a.x+a.y+a.z);
+}
+
+double costeta(vectorR3 a,vectorR3 b){
+return (dot(a,b)/(norma(a)*norma(b)));
+}
+
+class Triangle{
+private:
+    vectorR3 a;
+    vectorR3 b;
+    vectorR3 c;
+    cor tcor;
+public:
+    Triangle(){
+    a.x = 0;
+    a.y = 0;
+    a.z = 10;/// z -3
+    b.x = 254;
+    b.y = 512;
+    b.z = 10;/// mesmo z
+    c.x = 512;
+    c.y = 0;
+    c.z = 10;/// mesmo z
+tcor.set_color(255,0,0,255);///cor vermelha
+    }
+    void set_triangle(double ax,double ay,double az,double bx,double by,double bz,double cx,double cy,double cz,cor color){
+    a.x = ax;
+    a.y = ay;
+    a.z = az;
+    b.x = ax;
+    b.y = ay;
+    b.z = az;
+    c.x = ax;
+    c.y = ay;
+    c.z = az;
+
+    tcor = color;
+    }
+    cor get_cor(){return tcor;}
+    vectorR3 get_a(){return a;}
+    vectorR3 get_b(){return b;}
+    vectorR3 get_c(){return c;}
+
+      bool intersect(Ray ray, double &t){
+
+    double menx,maix,meny,maiy,menz,maiz;
+    ///calculo da bounding box
+    menx=a.x;
+    maix=a.x;
+    meny=a.y;
+    maiy=a.y;
+    menz=a.z;
+    maiz=a.z;
+    if(a.x<b.x){maix=b.x;}
+    if(b.x<c.x){maix=c.x;}
+    if(a.x>b.x){menx=b.x;}
+    if(b.x>c.x){menx=c.x;}
+
+    if(a.y<b.y){maiy=b.y;}
+    if(b.y<c.y){maiy=c.y;}
+    if(a.y>b.y){meny=b.y;}
+    if(b.z>c.y){meny=c.y;}
+
+    if(a.z<b.z){maiz=b.z;}
+    if(b.z<c.z){maiz=c.z;}
+    if(a.z>b.z){menz=b.z;}
+    if(b.z>c.z){menz=c.z;}
+
+          double a1,a2,a3,area;
+    vectorR3 o = ray.origem;
+    vectorR3 d = ray.direcao;
+
+    vectorR3 ab,ac,N,N1,N2,N3,cp,cb,ap,bp;
+    vectorR3 p;//ponto de interseção raio, plano
+    ab.x = b.x-a.x;
+    ab.y = b.y-a.y;
+    ab.z = b.z-a.z;
+    ac.x = c.x-a.x;
+    ac.y = c.y-a.y;
+    ac.z = c.z-a.z;
+    cb.x = b.x-c.x;
+    cb.y = b.y-c.y;
+    cb.z = b.z-c.z;
+    N=cross(ab,ac);
+    area=norma(N)/2;
+    double D = N.x*c.x+N.y*c.y+N.z*c.z;
+    ///equacao do plano pi: N.x*X+N.y*Y+N.z*Z=d
+    ///equacao da reta do raio: x=o.x+d.x*t
+    ///y=o.y+d.y*t
+    ///z=o.z+d.z*t
+   if(N.x*d.x+N.y*d.y+N.z*d.z!=0){t=(D-N.x*o.x-N.y*o.y-N.z*o.z)/(N.x*d.x+N.y*d.y+N.z*d.z);
+   p.x=o.x+d.x*t;
+   p.y=o.y+d.y*t;
+   p.z=o.z+d.z*t;
+
+   ///if(p.x>maix||p.x<menx||p.y>maiy||p.y<meny||p.z>maiz||p.z<menz)return false;///teste da bounding box
+
+    ap.x = p.x-a.x;
+    ap.y = p.y-a.y;
+    ap.z = p.z-a.z;
+
+    bp.x = b.x-p.x;
+    bp.y = b.y-p.y;
+    bp.z = b.z-p.z;
+
+    cp.x = p.x-c.x;
+    cp.y = p.y-c.y;
+    cp.z = p.z-c.z;
+
+    N1=cross(ac,ap);
+    N2=cross(ab,bp);
+    N3=cross(cb,cp);
+
+    a1=norma(N1)/2;
+    a2=norma(N2)/2;
+    a3=norma(N3)/2;
+   ///calcula a1,a2 e a3
+   if (round(area)==round(a1+a2+a3))return true;
+   else return false;
+   }else return false;
+    }
+};
 //==============================================================
 
 //*****************************************************************************
@@ -427,281 +582,50 @@ FBptr[offset + 2] = blue;
 FBptr[offset + 3] = alfa;
 }
 
-void DrawLine(ponto p0,cor c0,ponto p1,cor c1)//p0 e sua respectiva cor cor, p1 e suacor.
-{
-    //para espelhar defini alguns ifs com algumas condições especificas para determinar
-    //o quadrante que a reta se encontrava e setei um valor especifico de flag, para realizar
-    //as operações inversas antes de passar as coordenadas x,y para o putpixel e o calculo do
-    //offset para ser impresso no local aproximado em que sua reta é descrita matematicamente.
 
-//variaveis para os casos de dx<dy para poder usar o segundo octante
-int flag=0;
-int temp;
-int ft=0;//se mudar os pontos, muda as cores, muda as cores dos pixel iniciais pintados na tela
-cor ct;//caso precise inverter a cor
-//cores de entrada
-float ri,gi,bi,ai,rf,gf,bf,af;
-//variacao da cor da linha
-float r_var,g_var,b_var,a_var;
+void DrawTela(){
+	vectorR3 c_t;
+	ponto pt;
+//for each pixel
+for(int i=0;i<W;i++){
+for(int j=0;j<H;j++){
+c_t.z=0;
+c_t.x=i;
+c_t.y=j;
+Ray r;
+vectorR3 tmp;
+tmp.x=H/2;tmp.y=W/2;tmp.z=-10;
+r.origem=tmp;
+tmp.x=c_t.x-tmp.x;
+tmp.y=c_t.y-tmp.y;
+tmp.z=c_t.z-tmp.z;
+double norm=norma(tmp);
+tmp.x=tmp.x/norm;
+tmp.y=tmp.y/norm;
+tmp.z=tmp.z/norm;
+r.direcao=tmp;
+pt.set_x_y(c_t.x,c_t.y);
 
-ponto pxy;//para o loop
-    //Po(x0,y0)
-int x0=p0.get_x();
-int y0=p0.get_y();
-    //P1(x1,y1)
-int x1=p1.get_x();
-int y1=p1.get_y();
-    //variação de x e de y
-int dx = x1 - x0;
-int dy = y1 - y0;
+double t = 20000;
 
-if(dy<0){
-temp=x0;
-x0=x1;
-x1=temp;
-temp=y0;
-y0=y1;
-y1=temp;
-dx = x1 - x0;
-dy = y1 - y0;
-ct=c0;
-c0=c1;
-c1=ct;
-ft=1;//flag de mudança de cor
-}
+///Light luz;
+///tmp.x=0;tmp.y=30;tmp.z=0;
+///luz.pos=tmp;
 
-if(dx<0&&dy>=0&&mod_(dx)>=mod_(dy)){flag+=2;
-x0*=-1;
-x1*=-1;
-dx = x1 - x0;
-dy = y1 - y0;
-}
+Triangle triangulo;
 
-if(dx<dy&&dx>=0){
-flag++;//caso o dx>dy, com x e y positivos, temos o segundo octante,
-//flag serve para inverter o x pelo y na hora de chamar PutPixel(cor,ponto);
-//troca x por y nos dois pontos e recalcula tudo normal
-temp=x0;/**troca x pelo y**/
-x0=y0;//x0 recebe y0
-y0=temp;//y0 recebe x0
-temp=x1;
-x1=y1;//x1 recebe y1
-y1=temp;//y1 recebe x1
-dx = x1 - x0;// recalcula os valores de dx e dy
-dy = y1 - y0;
-}
+//check for intercections
+if(triangulo.intersect(r,t)){
+   //color the pixel
+	PutPixel(triangulo.get_cor(), pt);//cor e coordenada de tela
 
-if(dx<0&&dy>=0&&mod_(dx)<mod_(dy)){
-flag+=5;
-temp=x0;/**troca x pelo y**/
-x0=y0;//x0 recebe y0
-y0=temp;//y0 recebe x0
-temp=x1;
-x1=y1;//x1 recebe y1
-y1=temp;//y1 recebe x1
-x0*=-1;
-x1*=-1;
-x1+=512;
-x0+=512;
-dx = x1 - x0;
-dy = y1 - y0;
-if(dy<0){
-temp=x0;
-x0=x1;
-x1=temp;
-temp=y0;
-y0=y1;
-y1=temp;
-dx = x1 - x0;
-dy = y1 - y0;
-ct=c0;
-c0=c1;
-c1=ct;
-ft=1;//flag de mudança de cor
 }
 }
-//cor de p0
-ri=c0.get_r();
-gi=c0.get_g();
-bi=c0.get_b();
-ai=c0.get_a();
-//cor de p1
-rf=c1.get_r();
-gf=c1.get_g();
-bf=c1.get_b();
-af=c1.get_a();
-//variação de cor
-r_var=(float)(rf-ri)/(dx+0.00001);//+0.00001para evitar divisão por zero
-g_var=(float)(gf-gi)/(dx+0.00001);
-b_var=(float)(bf-bi)/(dx+0.00001);
-a_var=(float)(af-ai)/(dx+0.00001);
-//variavel de decisão para acender o pixel d
-int dnew=2*dy-dx;//primeira variavel de decisão
-int d_new;
-int inc_e=2*dy;
-int inc_ne=2*(dy-dx);
-d_new=2*dy-dx;//primeiro dold
-int x=x0;int y=y0;
-cor cl;ponto pl;
-//pinta pontos limite com cores invertidas ou não, dependendo do valor da flag de cor
-if(ft==0){
-PutPixel(c0,p0);
-PutPixel(c1,p1);}
-if(ft==1&&flag!=5){
-PutPixel(c0,p1);
-PutPixel(c1,p0);}
-for(int i=x;i<x1;i++){
-   if(d_new<=0){
-    d_new+=inc_e;
-    x++;
-   }
-   else{
-    d_new+=inc_ne;
-    x++;
-    y++;
-   }
-   //variação das cores
-    ri+=r_var;
-    gi+=g_var;
-    bi+=b_var;
-    ai+=a_var;
-   cl.set_color(ri,gi,bi,ai);
-   if(flag==0){
-    pl.set_x_y(x,y);
-   }
-   if(flag==1){
-    pl.set_x_y(y,x);
-   }
-   if(flag==2){
-    pl.set_x_y(-x,y);
-   }
-   if(flag==5){
-    pl.set_x_y(y,-x+512);
-   }
-   PutPixel(cl,pl);
 }
 }
 
-void DrawTriangle(ponto pa,cor ca,ponto pb,cor cb,ponto pc,cor cc){
-//o ponto a tem coordenadas pa(xa,ya) e cor ca
-//o ponto b tem coordenadas pb(xb,yb) e cor cb
-//o ponto c tem coordenadas pc(xc,yc) e cor cc
-
-//ab
-DrawLine(pa,ca,pb,cb);
-//bc
-DrawLine(pb,cb,pc,cc);
-//ca
-DrawLine(pc,cc,pa,ca);
-}
-
-void FillDrawing(int xmin,int xmax,int ymin,int ymax){
-    unsigned char r,g,b,a;
-    int tmp;
-    cor c1,c2;
-    int o,o_;
-    ponto p0,pk;
-for(int x=xmin;x<xmax;x++){
-    for(int y=ymin;y<ymax;y++){
- o = 4*x + 4*y*IMAGE_WIDTH;
-if(FBptr[o]>0||FBptr[o+1]>0||FBptr[o+2]>0){
-            for(int k=y+1;k<ymax;k++){
-            o_=4*x+4*k*IMAGE_WIDTH;
-            if(FBptr[o_]>0||FBptr[o_+1]>0||FBptr[o_+2]>0){
-            p0.set_x_y(x,y);
-            pk.set_x_y(x,k);
-            if(k<ymax)y=k+1;//para nao precisar varrer isso dnv
-            else y=k-1;
-            r=FBptr[o];
-            g=FBptr[o+1];
-            b=FBptr[o+2];
-            a=FBptr[o+3];
-            c1.set_color(r,g,b,a);
-            r=FBptr[o_];
-            g=FBptr[o_+1];
-            b=FBptr[o_+2];
-            a=FBptr[o_+3];
-            c2.set_color(r,g,b,a);
-            DrawLine(p0,c1,pk,c2);
-            }        }
-}//mantem x, varia só o y
-    }//y
-}//x
-}
-
-void DrawTrianglePreenchido(ponto pa,cor ca,ponto pb,cor cb,ponto pc,cor cc){
-DrawTriangle(pa,ca,pb,cb,pc,cc);
-int xa=pa.get_x();
-int xb=pb.get_x();
-int xc=pc.get_x();
-int ya=pa.get_y();
-int yb=pb.get_y();
-int yc=pc.get_y();
-int xmax,ymax,xmin,ymin;//bounding box
-//xmax
-xmax=max_(xa,xb);
-xmax=max_(xmax,xc);
-xmax++;
-//ymax
-ymax=max_(ya,yb);
-ymax=max_(ymax,yc);
-ymax++;
-//xmin
-xmin=min_(xa,xb);
-xmin=min_(xmin,xc);
-xmin--;
-//ymin
-ymin=min_(ya,yb);
-ymin=min_(ymin,yc);
-ymin--;
-//FillDrawing(0,512,0,512);
-FillDrawing(xmin,xmax,ymin,ymax);
-}
 
 
-void DrawCircle(ponto p, int r,cor c) {
-int x = 0;
-int y = r;
-int d = 1-r;
-int px = p.get_x();
-int py = p.get_y();
-ponto p1,p2;
-int xt,yt;
-while (x<y) {
-    p1.set_x_y(x+px,y+py);
-    PutPixel(c,p1);
-    p1.set_x_y(y+px,x+py);
-    PutPixel(c,p1);
-    p1.set_x_y(-x+px,y+py);
-    PutPixel(c,p1);
-    p1.set_x_y(-y+px,x+py);
-    PutPixel(c,p1);
-    p1.set_x_y(x+px,-y+py);
-    PutPixel(c,p1);
-    p1.set_x_y(y+px,-x+py);
-    PutPixel(c,p1);
-    p1.set_x_y(-x+px,-y+py);
-    PutPixel(c,p1);
-    p1.set_x_y(-y+px,-x+py);
-    PutPixel(c,p1);
-    if (d<0) {//escolher e
-        d += 2*x+3;
-    } else {
-        d += 2*(x-y)+5;
-        --y;}++x;}}
-void DrawCirclePreenchido(ponto p, int r,cor c) {
-int xmax,xmin,ymax,ymin;
-xmax=p.get_x()+r+1;
-xmin=p.get_x()-r-1;
-ymax=p.get_y()+r+1;
-ymin=p.get_y()-r-1;
-DrawCircle(p,r,c);
-FillDrawing(xmin,xmax,ymin,ymax);
-//while(r>0){
-  //  DrawCircle(p,r,c);
-    //r--;
-//}
-}
 
 
 #endif // _MYGL_H_
